@@ -3,26 +3,31 @@ from os.path import isfile, join
 
 path = 'E:\\Annie\\181023_114147_Annie_TFM_10-23-18_Plate-1\\181023_175144_Plate 2 - Copy'
 chdir(path)
+
+# Retrieve a list of files in the directory given in PATH
 dir_list = [f for f in listdir(path) if isfile(join(path, f))]
 
+# Retrieves the file names and splits them
+# 0     1    2        3        4      5
+#well-read-channel-position-channel-time.tiff
 wells = {}
-for i,j in enumerate(dir_list):
-    parts = j.split('_')
+for i in dir_list:
+    parts = i.split('_')
     if parts[0] not in wells.keys():
         wells[parts[0]] = {}
         wells[parts[0]][parts[3]] = {}
-        wells[parts[0]][parts[3]][parts[2]] = [j]
+        wells[parts[0]][parts[3]][parts[2]] = [i]
     else:
         if parts[3] not in wells[parts[0]].keys():
             wells[parts[0]][parts[3]] = {}
-            wells[parts[0]][parts[3]][parts[2]] = [j]
+            wells[parts[0]][parts[3]][parts[2]] = [i]
         else:
             if parts[2] not in wells[parts[0]][parts[3]].keys():
-                wells[parts[0]][parts[3]][parts[2]] = [j]
+                wells[parts[0]][parts[3]][parts[2]] = [i]
             else:
-                wells[parts[0]][parts[3]][parts[2]].append(j)
-                
-for i,well in enumerate(wells.keys()):
+                wells[parts[0]][parts[3]][parts[2]].append(i)
+
+for well in wells.keys():
     try:
         mkdir(well)
     except:
@@ -45,7 +50,7 @@ for i,well in enumerate(wells.keys()):
             else:
                 sub = 'phase0'
                 num_images = len(wells[well][position][channel])
-                
+
             for num,image in enumerate(wells[well][position][channel]):
                 if num < num_images:
                     rename(join(path, image), join(pos_path, '{}{}.tif'.format(sub, num+1)))
@@ -56,6 +61,6 @@ for i,well in enumerate(wells.keys()):
 
 
 
-    
+
 # 0     1    2        3        4      5
 #well-read-channel-position-channel-time.tiff
