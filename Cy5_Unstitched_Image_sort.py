@@ -5,36 +5,46 @@ path = 'E:\\Annie\\181023_114147_Annie_TFM_10-23-18_Plate-1\\181023_175144_Plate
 chdir(path)
 
 # Retrieve a list of files in the directory given in PATH
-dir_list = [f for f in listdir(path) if isfile(join(path, f))]
+image_list = [f for f in listdir(path) if isfile(join(path, f))]
 
-# Retrieves the file names and splits them
-# 0     1    2        3        4      5
-#well-read-channel-position-channel-time.tiff
-wells = {}
-for i in dir_list:
-    parts = i.split('_')
-    if parts[0] not in wells.keys():
-        wells[parts[0]] = {}
-        wells[parts[0]][parts[3]] = {}
-        wells[parts[0]][parts[3]][parts[2]] = [i]
+# Retrieves the file names and splits the strings by '-' producing 6 pieces with the following designations:
+#   0    1     2       3        4      5
+# well-read-channel-position-channel-time.tiff
+# Sorts the images into a set of nested dictionaries for each well,imaging position and then channel
+# creating the dictionary as new keys are found.
+# The dictionary has the form of {Well:{Position:{Channel}}}
+plate_wells = {}
+for file in image_list:
+    filename = i.split('_')
+    well = filename[0]
+    position = filename[3]
+    channel = filename[2]
+    if well not in plate_wells.keys():
+        plate_wells[well] = {}
+        plate_wells[well][position] = {}
+        plate_wells[well][position][channel] = [i]
     else:
-        if parts[3] not in wells[parts[0]].keys():
-            wells[parts[0]][parts[3]] = {}
-            wells[parts[0]][parts[3]][parts[2]] = [i]
+        if position not in plate_wells[well].keys():
+            plate_wells[well][position] = {}
+            plate_wells[well][position][channel] = [i]
         else:
-            if parts[2] not in wells[parts[0]][parts[3]].keys():
-                wells[parts[0]][parts[3]][parts[2]] = [i]
+            if channel not in plate_wells[well][position].keys():
+                plate_wells[well][position][channel] = [i]
             else:
-                wells[parts[0]][parts[3]][parts[2]].append(i)
+                plate_wells[well][position][channel].append(i)
 
-for well in wells.keys():
+# steps through each well in the dictionary. Creates a directory named for the
+# well and changes the working directory to the new well directory
+for plate_well in plate_wells.keys():
     try:
         mkdir(well)
     except:
         pass
     well_path = join(path,well)
 
-    for position in wells[well].keys():
+    # Steps through each position in the well. Creates a directory for the Position
+    # and changes the working directory to the directory
+    for position in plate_wells[well].keys():
         chdir(well_path)
         try:
             mkdir(position)
@@ -43,15 +53,16 @@ for well in wells.keys():
         pos_path = join(well_path, position)
         chdir(path)
 
-        for channel in wells[well][position].keys():
+        # Steps through the channels at the position and assigns the
+        for channel in plate_wells[well][position].keys():
             if channel == '1':
                 sub = 'image0'
-                num_images = len(wells[well][position][channel]) - 1
+                num_images = len(plate_wells[well][position][channel]) - 1
             else:
                 sub = 'phase0'
-                num_images = len(wells[well][position][channel])
+                num_images = len(plate_wells[well][position][channel])
 
-            for num,image in enumerate(wells[well][position][channel]):
+            for num,image in enumerate(plate_wells[well][position][channel]):
                 if num < num_images:
                     rename(join(path, image), join(pos_path, '{}{}.tif'.format(sub, num+1)))
                 else:
