@@ -66,7 +66,10 @@ for plate_well in plate_wells.keys():
         # Steps through the channels at the position and assigns the image prefix
         # image0 for GFP bead images
         # phase0 for brightfield cell images
+<<<<<<< HEAD
 
+=======
+>>>>>>> b29daa148d0d1ec4c6f5c10f9a9d4ac198766347
         for channel in plate_wells[well][position].keys():
             if channel == '{}'.format(GFP_channel):
                 prefix = 'image'
