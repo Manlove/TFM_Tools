@@ -1,9 +1,19 @@
 from os import chdir, listdir, mkdir, rename
 from os.path import isfile, join
 
+##############################################################################
+# - Given path should be to the main folder containing all of the images outputted
+#   by the cytation 5
+# - GFP_channel should be whichever channel is indicated in the GFP image at
+#   Position 2 in the filename
+#    0    1     2       3        4      5
+#   well-read-channel-position-channel-time.tiff
 path = 'E:\\Annie\\181023_114147_Annie_TFM_10-23-18_Plate-1\\181023_175144_Plate 2 - Copy'
-chdir(path)
+GFP_channel = '2'
+##############################################################################
 
+
+chdir(path)
 # Retrieve a list of files in the directory given in PATH
 image_list = [f for f in listdir(path) if isfile(join(path, f))]
 
@@ -53,18 +63,29 @@ for plate_well in plate_wells.keys():
         pos_path = join(well_path, position)
         chdir(path)
 
-        # Steps through the channels at the position and assigns the
+        # Steps through the channels at the position and assigns the image prefix
+        # image0 for GFP bead images
+        # phase0 for brightfield cell images
+
         for channel in plate_wells[well][position].keys():
-            if channel == '1':
-                sub = 'image0'
+            if channel == '{}'.format(GFP_channel):
+                prefix = 'image'
                 num_images = len(plate_wells[well][position][channel]) - 1
             else:
-                sub = 'phase0'
+                prefix = 'phase'
                 num_images = len(plate_wells[well][position][channel])
 
+            # For each image in the channel list moves the file from the main
+            # Folder into the folder for the well and position. Names the file
+            # With the prefix and the number of the image.
             for num,image in enumerate(plate_wells[well][position][channel]):
+                image_num = num + 1
+                if image_num < 10:
+                    image_num = "0" + str(image_num)
+                else:
+                    image_num = str(image_num)
                 if num < num_images:
-                    rename(join(path, image), join(pos_path, '{}{}.tif'.format(sub, num+1)))
+                    rename(join(path, image), join(pos_path, '{}{}.tif'.format(prefix, image_num)))
                 else:
                     rename(join(path, image), join(pos_path, 'trypsin.tif'))
 
