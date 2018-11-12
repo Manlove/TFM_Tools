@@ -1,3 +1,12 @@
+"""
+Cy5_Unstitched_Image_sort.py
+Logan Manlove
+11/12/2018
+
+
+"""
+
+
 from os import chdir, listdir, mkdir, rename
 from os.path import isfile, join
 
@@ -5,11 +14,14 @@ from os.path import isfile, join
 # - Given path should be to the main folder containing all of the images outputted
 #   by the cytation 5
 # - GFP_channel should be whichever channel is indicated in the GFP image at
-#   Position 2 in the filename
-#    0    1     2       3        4      5
-#   well-read-channel-position-channel-time.tiff
-path = 'E:\\Annie\\181023_114147_Annie_TFM_10-23-18_Plate-1\\181023_175144_Plate 2 - Copy'
+#   Position 2 in the filename.
+# - Phase_channel should be whichever channel is indicated by the Phase image
+#   at Position 2 in the filename.
+#  0    1     2       3        4      5
+# well-read-channel-position-channel-time.tiff
+path = ''
 GFP_channel = '2'
+Phase_channel = '1'
 ##############################################################################
 
 
@@ -25,36 +37,37 @@ image_list = [f for f in listdir(path) if isfile(join(path, f))]
 # The dictionary has the form of {Well:{Position:{Channel}}}
 plate_wells = {}
 for file in image_list:
-    filename = i.split('_')
+    filename = file.split('_')
     well = filename[0]
     position = filename[3]
     channel = filename[2]
     if well not in plate_wells.keys():
         plate_wells[well] = {}
         plate_wells[well][position] = {}
-        plate_wells[well][position][channel] = [i]
+        plate_wells[well][position][channel] = [file]
     else:
         if position not in plate_wells[well].keys():
             plate_wells[well][position] = {}
-            plate_wells[well][position][channel] = [i]
+            plate_wells[well][position][channel] = [file]
         else:
             if channel not in plate_wells[well][position].keys():
-                plate_wells[well][position][channel] = [i]
+                plate_wells[well][position][channel] = [file]
             else:
-                plate_wells[well][position][channel].append(i)
+                plate_wells[well][position][channel].append(file)
 
 # steps through each well in the dictionary. Creates a directory named for the
 # well and changes the working directory to the new well directory
 for plate_well in plate_wells.keys():
+    print("~~~~~{}~~~~~".format(plate_well))
     try:
-        mkdir(well)
+        mkdir(plate_well)
     except:
         pass
-    well_path = join(path,well)
+    well_path = join(path,plate_well)
 
     # Steps through each position in the well. Creates a directory for the Position
     # and changes the working directory to the directory
-    for position in plate_wells[well].keys():
+    for position in plate_wells[plate_well].keys():
         chdir(well_path)
         try:
             mkdir(position)
@@ -64,38 +77,36 @@ for plate_well in plate_wells.keys():
         chdir(path)
 
         # Steps through the channels at the position and assigns the image prefix
-        # image0 for GFP bead images
-        # phase0 for brightfield cell images
-<<<<<<< HEAD
+        # image for GFP bead images
+        # phase for brightfield cell images
 
-=======
->>>>>>> b29daa148d0d1ec4c6f5c10f9a9d4ac198766347
-        for channel in plate_wells[well][position].keys():
+        for channel in plate_wells[plate_well][position].keys():
+            num_images = len(plate_wells[plate_well][position][channel]) - 1
             if channel == '{}'.format(GFP_channel):
                 prefix = 'image'
-                num_images = len(plate_wells[well][position][channel]) - 1
-            else:
+            elif channel == '{}'.format(Phase_channel):
                 prefix = 'phase'
-                num_images = len(plate_wells[well][position][channel])
+            else:
+                prefix = 'rfp'
+                num_images = len(plate_wells[plate_well][position][channel])
 
             # For each image in the channel list moves the file from the main
             # Folder into the folder for the well and position. Names the file
             # With the prefix and the number of the image.
-            for num,image in enumerate(plate_wells[well][position][channel]):
+            plate_wells[plate_well][position][channel].sort()
+            for num,image in enumerate(plate_wells[plate_well][position][channel]):
                 image_num = num + 1
                 if image_num < 10:
                     image_num = "0" + str(image_num)
                 else:
                     image_num = str(image_num)
                 if num < num_images:
-                    rename(join(path, image), join(pos_path, '{}{}.tif'.format(prefix, image_num)))
-                else:
-                    rename(join(path, image), join(pos_path, 'trypsin.tif'))
-
-
-
-
-
-
-# 0     1    2        3        4      5
-#well-read-channel-position-channel-time.tiff
+                    try:
+                        rename(join(path, image), join(pos_path, '{}{}.tif'.format(prefix, image_num)))
+                    except:
+                        print("Error with {}".format(image))
+                elif num == num_images and channel == '{}'.format(GFP_channel):
+                    try:
+                        rename(join(path, image), join(pos_path, 'trypsin.tif'))
+                    except:
+                        print("Error with {}".format(image))
