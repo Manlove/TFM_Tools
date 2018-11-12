@@ -53,7 +53,9 @@ for plate_well in plate_wells.keys():
         pos_path = join(well_path, position)
         chdir(path)
 
-        # Steps through the channels at the position and assigns the
+        # Steps through the channels at the position and assigns the image prefix
+        # image0 for GFP bead images
+        # phase0 for brightfield cell images
         for channel in plate_wells[well][position].keys():
             if channel == '1':
                 sub = 'image0'
@@ -62,6 +64,9 @@ for plate_well in plate_wells.keys():
                 sub = 'phase0'
                 num_images = len(plate_wells[well][position][channel])
 
+            # For each image in the channel list moves the file from the main
+            # Folder into the folder for the well and position. Names the file
+            # With the prefix and the number of the image.
             for num,image in enumerate(plate_wells[well][position][channel]):
                 if num < num_images:
                     rename(join(path, image), join(pos_path, '{}{}.tif'.format(sub, num+1)))
