@@ -20,14 +20,14 @@ well_list = [f for f in listdir(path) if isdir(join(path, f))]
 well_list.sort()
 
 for well in well_list:
-    print("~~~~~~~~~~{}~~~~~~~~~~~~~~~".format(well))
+    print("~~~~~~~~~~~~{}~~~~~~~~~~~~".format(well))
     well_path = join(path, well)
     chdir(well_path)
     position_list = [f for f in listdir(well_path) if isdir(join(well_path, f))]
     data = []
     for position in position_list:
         pos_path = join(well_path, position)
-        chdir(pos_path)    
+        chdir(pos_path)
         try:
             chdir(join(pos_path, "Tractions"))
         except:
@@ -49,7 +49,11 @@ for well in well_list:
             continue
 
     chdir(well_path)
-    data_out = pd.concat(data, axis = 1)
+    try:
+        data_out = pd.concat(data, axis = 1)
+    except:
+        print("No data to write\n")
+        continue
     try:
         data_out.to_excel('{}.xlsx'.format(well))
         print("Data Written to well")
@@ -65,5 +69,3 @@ for well in well_list:
 
 chdir(path)
 book.save('summary.xlsx')
-
-
