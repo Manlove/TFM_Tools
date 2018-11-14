@@ -13,7 +13,13 @@ path = askdirectory()
 book = Workbook()   # Workbook from openpyxl
 writer = pd.ExcelWriter(book, engine='openpyxl')  # Assign the openpyxl workbook to the pandas excel writer
 writer.book = book
+
+###############################################################################
+# The user must supply the number of time points that were performed in the
+# traction force experiment including the baseline run but not including the
+# typsin timepoint.
 time_points = 5
+###############################################################################
 
 # Changes the path to the directory selected, should be the main plate folder
 chdir(path)
