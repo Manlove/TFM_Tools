@@ -58,7 +58,7 @@ TFM_data_consolidation
     by Cy5_Unstitched_Image_sort. Usage of the script to retrieve data that was
     produced by a work flow that does not include those distinct steps my not succeed.
 
-  ~ To Use ~
+  ~ To Use ~ 
     Users must provide the number of time points that were run during the traction
     force experiment including the baseline point but not including the trypsin
     time point. This can be identified by the number of phase**.tiff images in
