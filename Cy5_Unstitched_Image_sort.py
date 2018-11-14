@@ -13,15 +13,15 @@ from os.path import isfile, join
 ##############################################################################
 # - Given path should be to the main folder containing all of the images outputted
 #   by the cytation 5
-# - GFP_channel should be whichever channel is indicated in the GFP image at
+# - Bead_channel should be whichever channel is indicated in the bead image at
 #   Position 2 in the filename.
-# - Phase_channel should be whichever channel is indicated by the Phase image
+# - Cell_channel should be whichever channel is indicated by the Cell image
 #   at Position 2 in the filename.
 #  0    1     2       3        4      5
 # well-read-channel-position-channel-time.tiff
 path = ''
-GFP_channel = '2'
-Phase_channel = '1'
+Bead_channel = '2'
+Cell_channel = '1'
 ##############################################################################
 
 
@@ -77,14 +77,14 @@ for plate_well in plate_wells.keys():
         chdir(path)
 
         # Steps through the channels at the position and assigns the image prefix
-        # image for GFP bead images
-        # phase for brightfield cell images
+        # image for fluorescent bead images
+        # phase for cell images
 
         for channel in plate_wells[plate_well][position].keys():
             num_images = len(plate_wells[plate_well][position][channel]) - 1
-            if channel == '{}'.format(GFP_channel):
+            if channel == '{}'.format(Bead_channel):
                 prefix = 'image'
-            elif channel == '{}'.format(Phase_channel):
+            elif channel == '{}'.format(Cell_channel):
                 prefix = 'phase'
             else:
                 prefix = 'rfp'
@@ -105,7 +105,7 @@ for plate_well in plate_wells.keys():
                         rename(join(path, image), join(pos_path, '{}{}.tif'.format(prefix, image_num)))
                     except:
                         print("Error with {}".format(image))
-                elif num == num_images and channel == '{}'.format(GFP_channel):
+                elif num == num_images and channel == '{}'.format(Bead_channel):
                     try:
                         rename(join(path, image), join(pos_path, 'trypsin.tif'))
                     except:
